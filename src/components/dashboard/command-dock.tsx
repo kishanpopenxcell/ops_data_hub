@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { LayoutDashboard, GitBranch, Headset, LogOut, TrendingUp, ShieldCheck } from "lucide-react";
+import Image from "next/image";
+import { LayoutDashboard, GitBranch, Headset, LogOut, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -165,8 +166,8 @@ export function CommandDock() {
 function DockLogo({ expanded }: { expanded: boolean }) {
   return (
     <div className="flex items-center gap-3 px-2 py-1.5">
-      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
-        <TrendingUp className="h-4 w-4" />
+      <div className="flex h-7 w-7 shrink-0 items-center justify-center">
+        <Image src="/logo-square.png" alt="OpsData Hub" width={28} height={28} className="h-full w-full object-contain" />
       </div>
       <AnimatePresence>
         {expanded && (
