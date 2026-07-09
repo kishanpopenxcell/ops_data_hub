@@ -62,7 +62,7 @@ export default function LoginPage() {
           Welcome back
         </h1>
         <p className="mt-1.5 text-sm text-text-muted">
-          Sign in to your MetricHub workspace
+          Sign in to your OpsData Hub workspace
         </p>
       </div>
 

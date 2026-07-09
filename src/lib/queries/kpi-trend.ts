@@ -29,25 +29,36 @@ export async function buildKpiTiles(
   supabase: SupabaseClient<Database>,
   specs: KpiTileSpec[],
 ): Promise<KpiTile[]> {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return [];
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role, hubspot_owner_id, team_id")
-    .eq("id", user.id)
-    .single();
-  if (!profile) return [];
-
   const metricKeys = specs.map((s) => s.metricKey);
-  const { data, error } = await supabase
-    .from("agg_kpi_daily")
-    .select("metric_key, date_key, value, owner_id, team_id")
-    .in("metric_key", metricKeys)
-    .order("date_key", { ascending: true });
 
+  // getClaims() verifies the session JWT locally (cached JWKS) instead of
+  // calling out to the Auth server like getUser() does -- same trick as
+  // middleware.ts -- so resolving it costs no network round trip. The KPI
+  // query doesn't depend on who the caller is (RLS handles that), so it
+  // runs concurrently with claims+profile instead of after them, turning
+  // what was 3 sequential round trips into effectively 1.
+  const [claimsResult, kpiResult] = await Promise.all([
+    supabase.auth.getClaims().then(async ({ data: claims }) => {
+      const userId = claims?.claims?.sub;
+      if (!userId) return null;
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role, hubspot_owner_id, team_id")
+        .eq("id", userId)
+        .single();
+      return profile;
+    }),
+    supabase
+      .from("agg_kpi_daily")
+      .select("metric_key, date_key, value, owner_id, team_id")
+      .in("metric_key", metricKeys)
+      .order("date_key", { ascending: true }),
+  ]);
+
+  const profile = claimsResult;
+  const { data, error } = kpiResult;
+
+  if (!profile) return [];
   if (error) throw error;
   if (!data) return [];
 

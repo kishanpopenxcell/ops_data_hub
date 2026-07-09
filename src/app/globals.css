@@ -2,80 +2,48 @@
 
 /*
   Warm graphite + amber design system.
-  Dark is the primary/default mood; light is a fully considered second theme,
-  not an inversion. Tokens follow prefers-color-scheme by default, then
-  data-theme on :root wins in both directions (viewer theme toggle).
+  Light is the primary/default theme -- every new visitor with no stored
+  preference sees light, regardless of OS color-scheme (see theme-script.ts).
+  Dark is a fully considered second theme, not an inversion, available via
+  the toggle. data-theme on :root wins in both directions once a visitor
+  has chosen (or theme-script.ts has stamped a value before first paint).
 */
 
 :root {
   /* base surfaces */
-  --color-base: #16151a;
-  --color-surface: #1f1e24;
-  --color-surface-raised: #26242c;
-  --color-border: #322f38;
-  --color-border-subtle: #2a2830;
+  --color-base: #faf8f4;
+  --color-surface: #ffffff;
+  --color-surface-raised: #ffffff;
+  --color-border: #e8e3d9;
+  --color-border-subtle: #f0ece2;
 
   /* text */
-  --color-text: #f0ede6;
-  --color-text-muted: #a8a3ab;
-  --color-text-faint: #6f6b74;
+  --color-text: #1e1b16;
+  --color-text-muted: #6b6459;
+  --color-text-faint: #a39c8e;
 
   /* accent -- amber/gold, the one bold color, carries all interactive weight */
-  --color-accent: #e8a33d;
-  --color-accent-strong: #f4b95c;
-  --color-accent-soft: #e8a33d1f;
+  --color-accent: #c67d1f;
+  --color-accent-strong: #a8680f;
+  --color-accent-soft: #c67d1f14;
 
   /* semantic (separate from accent) */
-  --color-good: #7fbf7f;
-  --color-good-soft: #7fbf7f1a;
-  --color-warn: #e8a33d;
-  --color-warn-soft: #e8a33d1a;
-  --color-crit: #e06c75;
-  --color-crit-soft: #e06c751a;
+  --color-good: #3a8f5c;
+  --color-good-soft: #3a8f5c14;
+  --color-warn: #c67d1f;
+  --color-warn-soft: #c67d1f14;
+  --color-crit: #c94f4f;
+  --color-crit-soft: #c94f4f14;
 
   /* chart palette -- categorical, warm-neutral family with accent as lead */
-  --color-chart-1: #e8a33d;
-  --color-chart-2: #d97b5f;
-  --color-chart-3: #7fbf7f;
-  --color-chart-4: #6b9bd1;
-  --color-chart-5: #b48ee0;
+  --color-chart-1: #c67d1f;
+  --color-chart-2: #b8583a;
+  --color-chart-3: #3a8f5c;
+  --color-chart-4: #3d76ad;
+  --color-chart-5: #8a5cb8;
 
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.24), 0 8px 24px -8px rgba(0, 0, 0, 0.4);
-  --shadow-card-hover: 0 2px 4px rgba(0, 0, 0, 0.28), 0 16px 40px -12px rgba(0, 0, 0, 0.5);
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --color-base: #faf8f4;
-    --color-surface: #ffffff;
-    --color-surface-raised: #ffffff;
-    --color-border: #e8e3d9;
-    --color-border-subtle: #f0ece2;
-
-    --color-text: #1e1b16;
-    --color-text-muted: #6b6459;
-    --color-text-faint: #a39c8e;
-
-    --color-accent: #c67d1f;
-    --color-accent-strong: #a8680f;
-    --color-accent-soft: #c67d1f14;
-
-    --color-good: #3a8f5c;
-    --color-good-soft: #3a8f5c14;
-    --color-warn: #c67d1f;
-    --color-warn-soft: #c67d1f14;
-    --color-crit: #c94f4f;
-    --color-crit-soft: #c94f4f14;
-
-    --color-chart-1: #c67d1f;
-    --color-chart-2: #b8583a;
-    --color-chart-3: #3a8f5c;
-    --color-chart-4: #3d76ad;
-    --color-chart-5: #8a5cb8;
-
-    --shadow-card: 0 1px 2px rgba(30, 27, 22, 0.06), 0 8px 24px -8px rgba(30, 27, 22, 0.1);
-    --shadow-card-hover: 0 2px 4px rgba(30, 27, 22, 0.08), 0 16px 40px -12px rgba(30, 27, 22, 0.16);
-  }
+  --shadow-card: 0 1px 2px rgba(30, 27, 22, 0.06), 0 8px 24px -8px rgba(30, 27, 22, 0.1);
+  --shadow-card-hover: 0 2px 4px rgba(30, 27, 22, 0.08), 0 16px 40px -12px rgba(30, 27, 22, 0.16);
 }
 
 :root[data-theme="dark"] {

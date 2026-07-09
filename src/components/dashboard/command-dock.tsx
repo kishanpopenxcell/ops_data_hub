@@ -177,7 +177,7 @@ function DockLogo({ expanded }: { expanded: boolean }) {
             transition={{ duration: 0.15 }}
             className="whitespace-nowrap font-display text-sm font-semibold tracking-tight text-text"
           >
-            MetricHub
+            OpsData Hub
           </motion.span>
         )}
       </AnimatePresence>

@@ -16,7 +16,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "MetricHub — Operations Analytics",
+  title: "OpsData Hub — Operations Analytics",
   description: "Operations intelligence for revenue and service teams.",
 };
 

@@ -5,13 +5,14 @@ import { useCallback, useEffect, useState } from "react";
 export type Theme = "light" | "dark";
 
 export function useTheme() {
-  // Server always renders "dark" (no DOM access during SSR) -- synced to the
-  // real value in the effect below, once mounted. This must NOT be a lazy
+  // Server always renders "light" (no DOM access during SSR, and light is
+  // the priority default -- see theme-script.ts) -- synced to the real
+  // value in the effect below, once mounted. This must NOT be a lazy
   // useState initializer that reads document on first render: the client's
   // first render has to match the server's HTML exactly, or React throws a
-  // hydration mismatch (confirmed via a live bug where a light-theme user's
-  // client immediately rendered Sun while the server had rendered Moon).
-  const [theme, setThemeState] = useState<Theme>("dark");
+  // hydration mismatch (confirmed via a live bug where a dark-theme user's
+  // client immediately rendered Moon while the server had rendered Sun).
+  const [theme, setThemeState] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

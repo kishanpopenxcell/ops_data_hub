@@ -3,9 +3,9 @@
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { TrendingUp } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { TypingCopy } from "@/components/auth/typing-copy";
+import { BrandMark } from "@/components/dashboard/brand-mark";
 
 const PANEL_CONTENT: Record<string, { src: string; heading: string; body: string }> = {
   "/login": {
@@ -32,14 +32,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <ThemeToggle />
       </div>
 
-      <div className="absolute left-6 top-6 z-20 flex items-center gap-2.5 lg:left-10 lg:top-10">
-        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-accent-soft text-accent">
-          <TrendingUp className="h-4 w-4" />
-        </div>
-        <span className="font-display text-base font-semibold tracking-tight text-text">
-          MetricHub
-        </span>
-      </div>
+      <BrandMark className="absolute left-6 top-6 z-20 flex items-center gap-2.5 lg:left-10 lg:top-10" />
 
       {/* Illustration side — sits on the same gradient as the form, no separate panel background */}
       <div className="relative hidden w-1/2 shrink-0 lg:block">

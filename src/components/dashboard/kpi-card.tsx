@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, animate } from "framer-motion";
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
-import { AreaChart, Area, ResponsiveContainer } from "recharts";
+import { AreaChart, Area, ResponsiveContainer, YAxis } from "recharts";
 import { cn } from "@/lib/utils";
 import { formatDelta, formatMetric, type MetricFormat } from "@/lib/format";
 import type { KpiTile } from "@/lib/mock/dashboard-data";
@@ -87,13 +87,18 @@ export function KpiCard({ kpi, index = 0 }: { kpi: KpiTile; index?: number }) {
 
       <div className="mt-4 h-10 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={chartData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+          <AreaChart data={chartData} margin={{ top: 2, right: 0, bottom: 2, left: 0 }}>
             <defs>
               <linearGradient id={`spark-${kpi.key}`} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor={chartColor} stopOpacity={0.35} />
                 <stop offset="100%" stopColor={chartColor} stopOpacity={0} />
               </linearGradient>
             </defs>
+            {/* Tight domain so small relative fluctuations (e.g. a win rate
+                moving between 51-55%) are still visible -- without this,
+                Recharts' default 0-based domain flattens any metric whose
+                absolute scale dwarfs its day-to-day variance. */}
+            <YAxis hide domain={["dataMin", "dataMax"]} />
             <Area
               type="monotone"
               dataKey="v"
