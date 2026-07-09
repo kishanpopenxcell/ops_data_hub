@@ -8,6 +8,7 @@ import { ArrowRight, TrendingUp, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -51,7 +52,10 @@ export default function SignupPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="flex flex-col items-center rounded-2xl border border-border bg-surface p-8 text-center shadow-[var(--shadow-card)]"
+        className={cn(
+          "flex flex-col items-center rounded-2xl border border-border/60 bg-surface/50 p-8 text-center backdrop-blur-xl",
+          "shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,var(--shadow-card)] lg:items-start lg:text-left",
+        )}
       >
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-good-soft text-good">
           <CheckCircle2 className="h-6 w-6" />
@@ -74,12 +78,12 @@ export default function SignupPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className="mb-8 flex flex-col items-center text-center">
+      <div className="mb-8 flex flex-col items-center text-center lg:items-start lg:text-left">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-accent-soft text-accent"
+          className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-accent-soft text-accent lg:hidden"
         >
           <TrendingUp className="h-5 w-5" />
         </motion.div>
@@ -93,7 +97,10 @@ export default function SignupPage() {
 
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6 shadow-[var(--shadow-card)]"
+        className={cn(
+          "flex flex-col gap-4 rounded-2xl border border-border/60 bg-surface/50 p-6 backdrop-blur-xl",
+          "shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,var(--shadow-card)]",
+        )}
       >
         <Input
           label="Full name"

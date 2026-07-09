@@ -7,6 +7,8 @@ import { AreaChart, Area, ResponsiveContainer } from "recharts";
 import { cn } from "@/lib/utils";
 import { formatDelta, formatMetric, type MetricFormat } from "@/lib/format";
 import type { KpiTile } from "@/lib/mock/dashboard-data";
+import { queryForKpi } from "@/lib/drill-through";
+import { useDrillThrough } from "./drill-through-context";
 
 export function MetricIsland({
   kpi,
@@ -37,6 +39,9 @@ export function MetricIsland({
   const chartData = kpi.trend.map((v, i) => ({ i, v }));
   const chartColor = isGoodDirection ? "var(--color-good)" : "var(--color-crit)";
 
+  const { open } = useDrillThrough();
+  const drillQuery = queryForKpi(kpi.key, kpi.label);
+
   return (
     <motion.div
       ref={ref}
@@ -44,10 +49,21 @@ export function MetricIsland({
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.4, delay: Math.min(index * 0.05, 0.15), ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -5 }}
+      onClick={drillQuery ? () => open(drillQuery) : undefined}
+      role={drillQuery ? "button" : undefined}
+      tabIndex={drillQuery ? 0 : undefined}
+      onKeyDown={
+        drillQuery
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") open(drillQuery);
+            }
+          : undefined
+      }
       className={cn(
         "group relative isolate overflow-hidden rounded-[32px] border border-accent/[0.08] bg-surface/90 p-6",
         "shadow-[0_1px_0_rgba(255,255,255,0.05)_inset,0_20px_40px_-24px_rgba(0,0,0,0.5)]",
         "transition-[transform,box-shadow] duration-300 hover:shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_28px_56px_-24px_rgba(0,0,0,0.6)]",
+        drillQuery && "cursor-pointer",
         className,
       )}
     >
@@ -62,13 +78,13 @@ export function MetricIsland({
         style={{ background: `radial-gradient(ellipse at bottom, ${chartColor}, transparent 70%)` }}
       />
 
-      <div className="relative flex items-start justify-between">
-        <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-text-muted">
+      <div className="relative flex items-start justify-between gap-2">
+        <span className="truncate text-[11px] font-medium uppercase tracking-[0.08em] text-text-muted">
           {kpi.label}
         </span>
         <span
           className={cn(
-            "flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums backdrop-blur-sm",
+            "flex shrink-0 items-center gap-0.5 rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums backdrop-blur-sm",
             isGoodDirection ? "bg-good-soft text-good" : "bg-crit-soft text-crit",
           )}
         >

@@ -904,13 +904,291 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      view_activity_summary: {
+        Row: {
+          activities_per_rep: number | null
+          tenant_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fact_activity_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      view_backlog_age_bands: {
+        Row: {
+          age_band: string | null
+          tenant_id: string | null
+          ticket_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raw_tickets_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      view_deal_source_mix: {
+        Row: {
+          deal_count: number | null
+          source: string | null
+          tenant_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raw_deals_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      view_deals_by_owner: {
+        Row: {
+          lost_count: number | null
+          open_count: number | null
+          owner_id: string | null
+          owner_name: string | null
+          tenant_id: string | null
+          won_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raw_deals_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      view_dq_completeness: {
+        Row: {
+          field: string | null
+          missing_count: number | null
+          object_type: string | null
+          tenant_id: string | null
+          total_count: number | null
+        }
+        Relationships: []
+      }
+      view_dq_issues: {
+        Row: {
+          createdate: string | null
+          issue_type: string | null
+          object_id: string | null
+          object_name: string | null
+          object_type: string | null
+          owner_id: string | null
+          owner_name: string | null
+          tenant_id: string | null
+        }
+        Relationships: []
+      }
+      view_dq_orphan_owners: {
+        Row: {
+          owner_id: string | null
+          record_count: number | null
+          tenant_id: string | null
+        }
+        Relationships: []
+      }
+      view_dq_stale_records: {
+        Row: {
+          days_stale: number | null
+          last_activity_at: string | null
+          object_id: string | null
+          object_name: string | null
+          object_type: string | null
+          owner_id: string | null
+          owner_name: string | null
+          tenant_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raw_deals_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      view_pipeline_summary: {
+        Row: {
+          avg_sales_cycle_days: number | null
+          decided_count: number | null
+          open_value: number | null
+          tenant_id: string | null
+          weighted_value: number | null
+          won_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raw_deals_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      view_recent_activity: {
+        Row: {
+          activity_type: string | null
+          amount: number | null
+          object_id: string | null
+          occurred_at: string | null
+          owner_id: string | null
+          tenant_id: string | null
+        }
+        Relationships: []
+      }
+      view_revenue_trend: {
+        Row: {
+          actual: number | null
+          month: string | null
+          tenant_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raw_deals_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      view_sla_by_priority: {
+        Row: {
+          attainment: number | null
+          priority: string | null
+          tenant_id: string | null
+          volume: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fact_ticket_sla_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      view_sla_summary: {
+        Row: {
+          avg_first_response_days: number | null
+          avg_resolution_days: number | null
+          open_backlog: number | null
+          sla_attainment: number | null
+          tenant_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fact_ticket_sla_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      view_stage_funnel: {
+        Row: {
+          avg_days: number | null
+          deal_count: number | null
+          display_order: number | null
+          stage_id: string | null
+          stage_label: string | null
+          tenant_id: string | null
+          total_value: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dim_pipeline_stage_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      view_stage_velocity: {
+        Row: {
+          avg_stage_velocity_days: number | null
+          tenant_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fact_stage_transition_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      view_stalled_deals: {
+        Row: {
+          baseline_avg_days: number | null
+          days_in_stage: number | null
+          deal_id: string | null
+          deal_name: string | null
+          entered_at: string | null
+          multiple_of_baseline: number | null
+          owner_id: string | null
+          owner_name: string | null
+          stage_id: string | null
+          stage_label: string | null
+          tenant_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fact_stage_transition_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      view_ticket_volume_trend: {
+        Row: {
+          created_count: number | null
+          date_key: string | null
+          resolved_count: number | null
+          tenant_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raw_tickets_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       auth_owner_id: { Args: never; Returns: string }
       auth_role: { Args: never; Returns: string }
       auth_team_id: { Args: never; Returns: string }
       auth_tenant_id: { Args: never; Returns: string }
+      backfill_agg_kpi_daily: {
+        Args: { p_days?: number; p_tenant_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

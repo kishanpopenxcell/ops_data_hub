@@ -7,6 +7,8 @@ import { AreaChart, Area, ResponsiveContainer } from "recharts";
 import { cn } from "@/lib/utils";
 import { formatDelta, formatMetric, type MetricFormat } from "@/lib/format";
 import type { KpiTile } from "@/lib/mock/dashboard-data";
+import { queryForKpi } from "@/lib/drill-through";
+import { useDrillThrough } from "./drill-through-context";
 
 export function KpiCard({ kpi, index = 0 }: { kpi: KpiTile; index?: number }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -29,6 +31,9 @@ export function KpiCard({ kpi, index = 0 }: { kpi: KpiTile; index?: number }) {
   const chartData = kpi.trend.map((v, i) => ({ i, v }));
   const chartColor = isGoodDirection ? "var(--color-good)" : "var(--color-crit)";
 
+  const { open } = useDrillThrough();
+  const drillQuery = queryForKpi(kpi.key, kpi.label);
+
   return (
     <motion.div
       ref={ref}
@@ -36,8 +41,19 @@ export function KpiCard({ kpi, index = 0 }: { kpi: KpiTile; index?: number }) {
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.3, delay: Math.min(index * 0.04, 0.12), ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -3 }}
+      onClick={drillQuery ? () => open(drillQuery) : undefined}
+      role={drillQuery ? "button" : undefined}
+      tabIndex={drillQuery ? 0 : undefined}
+      onKeyDown={
+        drillQuery
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") open(drillQuery);
+            }
+          : undefined
+      }
       className={cn(
         "group relative overflow-hidden rounded-2xl border border-border bg-surface p-5",
+        drillQuery && "cursor-pointer",
         "shadow-[var(--shadow-card)] transition-shadow duration-300 hover:shadow-[var(--shadow-card-hover)]",
       )}
     >
@@ -46,13 +62,13 @@ export function KpiCard({ kpi, index = 0 }: { kpi: KpiTile; index?: number }) {
         className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-accent/[0.06] blur-2xl transition-opacity duration-300 group-hover:opacity-100 opacity-0"
       />
 
-      <div className="flex items-start justify-between">
-        <span className="text-xs font-medium uppercase tracking-wide text-text-muted">
+      <div className="flex items-start justify-between gap-2">
+        <span className="truncate text-xs font-medium uppercase tracking-wide text-text-muted">
           {kpi.label}
         </span>
         <span
           className={cn(
-            "flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-semibold tabular-nums",
+            "flex shrink-0 items-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-semibold tabular-nums",
             isGoodDirection ? "bg-good-soft text-good" : "bg-crit-soft text-crit",
           )}
         >

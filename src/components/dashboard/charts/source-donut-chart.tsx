@@ -16,8 +16,8 @@ export function SourceDonutChart({ data }: { data: SourceDatum[] }) {
   const total = data.reduce((sum, d) => sum + d.value, 0);
 
   return (
-    <div className="flex items-center gap-6">
-      <div className="relative h-44 w-44 shrink-0">
+    <div className="flex flex-col items-center gap-6 sm:flex-row">
+      <div className="relative h-36 w-36 shrink-0 sm:h-44 sm:w-44">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -45,17 +45,17 @@ export function SourceDonutChart({ data }: { data: SourceDatum[] }) {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-2.5">
+      <div className="flex w-full min-w-0 flex-1 flex-col gap-2.5">
         {data.map((d, i) => (
           <div key={d.name} className="flex items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-2">
+            <div className="flex min-w-0 items-center gap-2">
               <span
                 className="h-2 w-2 shrink-0 rounded-full"
                 style={{ backgroundColor: COLORS[i % COLORS.length] }}
               />
-              <span className="text-text-muted">{d.name}</span>
+              <span className="truncate text-text-muted">{d.name}</span>
             </div>
-            <span className="font-medium tabular-nums text-text">{d.value}%</span>
+            <span className="shrink-0 font-medium tabular-nums text-text">{d.value}%</span>
           </div>
         ))}
       </div>

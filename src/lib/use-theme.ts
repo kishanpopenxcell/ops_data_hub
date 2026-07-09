@@ -1,17 +1,26 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export type Theme = "light" | "dark";
 
-function readInitialTheme(): Theme {
-  if (typeof document === "undefined") return "dark";
-  const current = document.documentElement.getAttribute("data-theme");
-  return current === "light" || current === "dark" ? current : "dark";
-}
-
 export function useTheme() {
-  const [theme, setThemeState] = useState<Theme>(readInitialTheme);
+  // Server always renders "dark" (no DOM access during SSR) -- synced to the
+  // real value in the effect below, once mounted. This must NOT be a lazy
+  // useState initializer that reads document on first render: the client's
+  // first render has to match the server's HTML exactly, or React throws a
+  // hydration mismatch (confirmed via a live bug where a light-theme user's
+  // client immediately rendered Sun while the server had rendered Moon).
+  const [theme, setThemeState] = useState<Theme>("dark");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const current = document.documentElement.getAttribute("data-theme");
+    if (current === "light" || current === "dark") {
+      setThemeState(current);
+    }
+    setMounted(true);
+  }, []);
 
   const setTheme = useCallback((next: Theme) => {
     document.documentElement.setAttribute("data-theme", next);
@@ -23,5 +32,5 @@ export function useTheme() {
     setTheme(theme === "dark" ? "light" : "dark");
   }, [theme, setTheme]);
 
-  return { theme, setTheme, toggleTheme };
+  return { theme, setTheme, toggleTheme, mounted };
 }

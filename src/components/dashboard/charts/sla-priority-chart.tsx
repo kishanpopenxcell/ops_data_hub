@@ -3,6 +3,8 @@
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { ChartTooltip } from "../chart-tooltip";
 import type { SlaPriorityDatum } from "@/lib/mock/dashboard-data";
+import { queryForPriority } from "@/lib/drill-through";
+import { useDrillThrough } from "../drill-through-context";
 
 function colorFor(attainment: number) {
   if (attainment >= 0.97) return "var(--color-good)";
@@ -12,6 +14,7 @@ function colorFor(attainment: number) {
 
 export function SlaPriorityChart({ data }: { data: SlaPriorityDatum[] }) {
   const chartData = data.map((d) => ({ ...d, attainmentPct: Math.round(d.attainment * 1000) / 10 }));
+  const { open } = useDrillThrough();
 
   return (
     <ResponsiveContainer width="100%" height={220}>
@@ -39,7 +42,16 @@ export function SlaPriorityChart({ data }: { data: SlaPriorityDatum[] }) {
           width={64}
         />
         <Tooltip cursor={{ fill: "var(--color-border-subtle)" }} content={<ChartTooltip formatter={(v) => `${v}%`} />} />
-        <Bar dataKey="attainmentPct" name="Attainment" radius={[0, 6, 6, 0]} isAnimationActive animationDuration={450} barSize={22}>
+        <Bar
+          dataKey="attainmentPct"
+          name="Attainment"
+          radius={[0, 6, 6, 0]}
+          isAnimationActive
+          animationDuration={450}
+          barSize={22}
+          cursor="pointer"
+          onClick={(entry) => open(queryForPriority((entry.payload as SlaPriorityDatum).priority))}
+        >
           {chartData.map((d, i) => (
             <Cell key={i} fill={colorFor(d.attainment)} />
           ))}

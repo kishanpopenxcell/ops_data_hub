@@ -26,3 +26,18 @@ export type FactActivity = Tables<"fact_activity">;
 export type AggKpiDaily = Tables<"agg_kpi_daily">;
 export type SyncJob = Tables<"sync_jobs">;
 export type AuditLog = Tables<"audit_log">;
+
+// Dashboard aggregation views (Phase 1)
+export type StageFunnelRow = Tables<"view_stage_funnel">;
+export type DealsByOwnerRow = Tables<"view_deals_by_owner">;
+export type DealSourceMixRow = Tables<"view_deal_source_mix">;
+export type RevenueTrendRow = Tables<"view_revenue_trend">;
+export type PipelineSummaryRow = Tables<"view_pipeline_summary">;
+export type StageVelocityRow = Tables<"view_stage_velocity">;
+export type ActivitySummaryRow = Tables<"view_activity_summary">;
+export type SlaSummaryRow = Tables<"view_sla_summary">;
+export type SlaByPriorityRow = Tables<"view_sla_by_priority">;
+export type TicketVolumeTrendRow = Tables<"view_ticket_volume_trend">;
+export type BacklogAgeBandsRow = Tables<"view_backlog_age_bands">;
+export type RecentActivityRow = Tables<"view_recent_activity">;
+export type StalledDealRow = Tables<"view_stalled_deals">;
