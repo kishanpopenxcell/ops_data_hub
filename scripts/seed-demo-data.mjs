@@ -323,7 +323,18 @@ async function main() {
   // -------------------------------------------------------------------
   // 8. Deals + stage transition history
   // -------------------------------------------------------------------
-  const DEAL_COUNT = 60;
+  // Volume and recency both matter for the KPI sparklines: the daily
+  // aggregates (agg_kpi_daily) are cumulative snapshots computed from these
+  // rows, so if deal creation/close dates cluster far outside the trailing
+  // 30-45 day trend window, every day's snapshot is identical and the
+  // sparkline renders as a flat line. Most deals are created within the
+  // trailing 60 days (dense enough that the window sees deals both opening
+  // AND closing on many different days, producing real up-and-down
+  // movement) with a smaller "long-tail" cohort further back for realism
+  // (every real pipeline has some old deals still open) and to give stalled
+  // deals genuinely old dwell times.
+  const DEAL_COUNT = 140;
+  const RECENT_DEAL_SHARE = 0.75; // fraction of deals created in the last ~60 days
   const dealRows = [];
   const transitionRows = [];
   const snapshotRows = [];
@@ -357,14 +368,29 @@ async function main() {
     // Deliberately stall ~10% of open deals far beyond stage baseline.
     const isStalled = isOpen && i % 10 === 3;
 
-    // createdAt must be far enough back to fit the full stage walk (including
-    // an inflated stall dwell, if any) without pushing exitedAt/closedate into
-    // the future. Closed deals with a stall are impossible by construction
-    // (isStalled requires isOpen), but closed deals still need enough runway
-    // for their full multi-stage walk.
+    // createdAt must be far enough back to fit the full stage walk without
+    // going negative, but closed deals' ACTUAL dwell time averages out to
+    // roughly the sum of each stage's avgDays (the 0.5+rand() jitter per
+    // stage averages to 1.0x, not the 1.5x worst case used elsewhere as a
+    // safety ceiling) -- about 26 days for this pipeline's 5 stages. Using
+    // that same 1.5x ceiling as the *typical* runway would push most closed
+    // deals' close dates well outside the last 30 days, flattening
+    // win_rate/avg_sales_cycle. So closed deals get their own, tighter
+    // runway floor close to the realistic mean dwell; the per-stage
+    // "cursor > now" clamp already protects against overshoot for the
+    // unlucky long-dwell draws.
+    const meanClosedDwell = Math.round(
+      DEAL_STAGES.slice(0, 4).reduce((sum, s) => sum + s.avgDays, 0) + DEAL_STAGES[4].avgDays,
+    );
     const maxPossibleDwell = DEAL_STAGES.reduce((sum, s) => sum + s.avgDays * 1.5, 0);
-    const minRunway = isOpen ? 15 : Math.ceil(maxPossibleDwell) + 20;
-    const createdDaysAgo = randInt(minRunway, 300);
+    const minRunway = isOpen ? 15 : meanClosedDwell;
+    const longTailFloor = isOpen ? 60 : Math.ceil(maxPossibleDwell) + 20;
+    // Stalled deals always come from the long-tail cohort -- they need to
+    // look genuinely old regardless of the recent/long-tail split below.
+    const isRecentCohort = !isStalled && rand() < RECENT_DEAL_SHARE;
+    const createdDaysAgo = isRecentCohort
+      ? randInt(minRunway, minRunway + 45)
+      : randInt(longTailFloor, longTailFloor + 260);
     const createdAt = daysAgo(createdDaysAgo);
 
     const amount = missingAmount ? null : randInt(8, 220) * 1000;
@@ -458,7 +484,7 @@ async function main() {
   // -------------------------------------------------------------------
   // 9. Tickets + SLA facts
   // -------------------------------------------------------------------
-  const TICKET_COUNT = 35;
+  const TICKET_COUNT = 90;
   const ticketRows = [];
   const ticketSlaRows = [];
   const ticketTransitionRows = [];
@@ -468,7 +494,9 @@ async function main() {
     const owner = pick(OWNERS);
     const priority = pick(TICKET_PRIORITIES);
     const subject = TICKET_SUBJECTS[i % TICKET_SUBJECTS.length];
-    const createdDaysAgo = randInt(0, 21);
+    // Spread across 45 days so agg_kpi_daily's 30-day trend window sees
+    // tickets both created AND closed on many different days.
+    const createdDaysAgo = randInt(0, 45);
     const createdAt = daysAgo(createdDaysAgo);
 
     const isDqBroken = i % 11 === 0;
@@ -558,7 +586,7 @@ async function main() {
   const activityRows = [];
   let activityCounter = 0;
   for (const owner of OWNERS) {
-    const count = randInt(25, 45);
+    const count = randInt(70, 110);
     for (let j = 0; j < count; j++) {
       activityCounter++;
       activityRows.push({
@@ -567,7 +595,11 @@ async function main() {
         type: pick(ACTIVITY_TYPES),
         owner_id: owner.hubspot_owner_id,
         team_id: teamIdByKey[owner.teamKey],
-        occurred_at: daysAgo(randInt(0, 30)),
+        // Spread across 60 days -- activities_per_rep uses a rolling 30-day
+        // window, so if all activity fits inside that window nothing ever
+        // "ages out" as the trend advances and the sparkline just ramps
+        // monotonically instead of fluctuating up and down.
+        occurred_at: daysAgo(randInt(0, 60)),
       });
     }
   }

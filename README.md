@@ -1,8 +1,8 @@
-# MetricHub
+# OpsData Hub
 
 **Operations Analytics on HubSpot** — a demo-ready analytics platform that turns raw pipeline, service, and productivity activity into decisions your team can act on.
 
-MetricHub gives revenue and support teams one workspace to watch deals move through the funnel, track SLA health, and catch data-quality problems before they quietly break a report — all scoped to who's looking, so an Admin, a Manager, and a Rep never see the same thing.
+OpsData Hub gives revenue and support teams one workspace to watch deals move through the funnel, track SLA health, and catch data-quality problems before they quietly break a report — all scoped to who's looking, so an Admin, a Manager, and a Rep never see the same thing.
 
 > This build runs entirely on seeded demo data in Supabase, not a live HubSpot connection. Everything you see — the numbers, the stalled deals, the tickets — is real data seeded into a real database and queried with real row-level security, just not synced from an actual HubSpot portal yet.
 
