@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowRight, TrendingUp, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -83,9 +84,9 @@ export default function SignupPage() {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-accent-soft text-accent lg:hidden"
+          className="mb-4 flex h-11 w-11 items-center justify-center lg:hidden"
         >
-          <TrendingUp className="h-5 w-5" />
+          <Image src="/logo-square.png" alt="OpsData Hub" width={44} height={44} className="h-full w-full object-contain" />
         </motion.div>
         <h1 className="font-display text-2xl font-semibold tracking-tight text-text">
           Create your workspace

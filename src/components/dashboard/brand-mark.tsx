@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { TrendingUp } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { ScrambleText } from "./scramble-text";
 
@@ -21,9 +21,9 @@ export function BrandMark({ className }: { className?: string }) {
         initial={{ scale: 0.7, opacity: 0.4 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        className="flex h-8 w-8 items-center justify-center rounded-xl bg-accent-soft text-accent"
+        className="flex h-8 w-8 shrink-0 items-center justify-center"
       >
-        <TrendingUp className="h-4 w-4" />
+        <Image src="/logo-square.png" alt="OpsData Hub" width={32} height={32} className="h-full w-full object-contain" priority />
       </motion.div>
       <ScrambleText
         key={`text-${pathname}`}
