@@ -1,9 +1,9 @@
 /**
  * HubSpot API client facade. While USE_MOCK_HUBSPOT=true (default, no dev app/sandbox
  * portal yet) every method returns fixture data from src/lib/mock/hubspot-data.ts.
- * Once a HubSpot developer app + sandbox portal exist (see DESIGN_02_HubSpot_Field_Mapping.md),
- * fill in the "real" branch of each method with actual fetch() calls against
- * https://api.hubapi.com -- callers never need to change.
+ * Once a HubSpot developer app + sandbox portal exist, fill in the "real" branch of
+ * each method with actual fetch() calls against https://api.hubapi.com -- callers
+ * never need to change.
  */
 
 import type { HubspotDeal, HubspotEngagement, HubspotOwner, HubspotPipeline, HubspotTicket } from "./types";
@@ -15,7 +15,12 @@ export interface HubspotClientOptions {
   accessToken: string;
 }
 
-export function createHubspotClient(_options: HubspotClientOptions) {
+// options is unused while useMock short-circuits every method; it stays in the
+// signature because the live branch needs accessToken for the Authorization
+// header, and callers already pass it.
+export function createHubspotClient(options: HubspotClientOptions) {
+  void options;
+
   return {
     async listDeals(): Promise<HubspotDeal[]> {
       if (useMock) return mockDeals;

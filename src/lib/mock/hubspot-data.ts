@@ -2,7 +2,7 @@
  * Mock HubSpot data used while USE_MOCK_HUBSPOT=true (no dev app / sandbox portal yet).
  * Shapes mirror src/lib/hubspot/types.ts. Swap the client in src/lib/hubspot/client.ts
  * for a real API-backed implementation once a HubSpot developer account + sandbox
- * portal exist -- see DESIGN_02_HubSpot_Field_Mapping.md.
+ * portal exist.
  */
 
 import type {

@@ -7,7 +7,6 @@ import { useState } from "react";
 import Image from "next/image";
 import { LayoutDashboard, GitBranch, Headset, LogOut, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const DOCK_ITEMS = [
@@ -23,8 +22,7 @@ export function CommandDock() {
   const [expanded, setExpanded] = useState(false);
 
   async function handleSignOut() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
     router.refresh();
   }

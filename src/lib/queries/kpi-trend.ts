@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import type { KpiTile } from "@/lib/mock/dashboard-data";
 import type { MetricFormat } from "@/lib/format";
+import { getMockSession } from "@/lib/auth/session.server";
 
 export interface KpiTileSpec {
   metricKey: string;
@@ -31,20 +32,18 @@ export async function buildKpiTiles(
 ): Promise<KpiTile[]> {
   const metricKeys = specs.map((s) => s.metricKey);
 
-  // getClaims() verifies the session JWT locally (cached JWKS) instead of
-  // calling out to the Auth server like getUser() does -- same trick as
-  // middleware.ts -- so resolving it costs no network round trip. The KPI
-  // query doesn't depend on who the caller is (RLS handles that), so it
-  // runs concurrently with claims+profile instead of after them, turning
-  // what was 3 sequential round trips into effectively 1.
-  const [claimsResult, kpiResult] = await Promise.all([
-    supabase.auth.getClaims().then(async ({ data: claims }) => {
-      const userId = claims?.claims?.sub;
-      if (!userId) return null;
+  // Auth is mocked (see src/lib/auth/mock-session.ts) -- there's no real
+  // Supabase session to pull claims from, so the caller's role comes from
+  // the demo session cookie instead. `supabase` here is a service-role
+  // client (RLS bypassed), so the profile lookup and KPI query still run
+  // concurrently, each scoped explicitly in code below.
+  const [profileResult, kpiResult] = await Promise.all([
+    getMockSession().then(async (session) => {
+      if (!session) return null;
       const { data: profile } = await supabase
         .from("profiles")
         .select("role, hubspot_owner_id, team_id")
-        .eq("id", userId)
+        .eq("role", session.role)
         .single();
       return profile;
     }),
@@ -55,7 +54,7 @@ export async function buildKpiTiles(
       .order("date_key", { ascending: true }),
   ]);
 
-  const profile = claimsResult;
+  const profile = profileResult;
   const { data, error } = kpiResult;
 
   if (!profile) return [];
