@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Download, ExternalLink, CheckCircle2 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-import { runDrillThroughQuery, type DrillThroughRecord } from "@/lib/queries/drill-through";
+import type { DrillThroughRecord } from "@/lib/queries/drill-through";
 import type { DrillThroughQuery } from "@/lib/drill-through";
 import { cn } from "@/lib/utils";
 
@@ -15,36 +14,59 @@ export function DrillThroughPanel({
   query: DrillThroughQuery | null;
   onClose: () => void;
 }) {
-  const [records, setRecords] = useState<DrillThroughRecord[]>([]);
-  const [reconciledSum, setReconciledSum] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // One state object keyed by the query it belongs to, instead of separate
+  // records/sum/loading/error slices. The previous version opened the effect
+  // with setLoading(true)/setError(null) to reset the slices for a new query,
+  // which is a setState-in-effect cascade (and briefly showed the previous
+  // query's rows). Deriving `loading` from "settled result is for a different
+  // query than the current one" needs no reset write at all.
+  const [result, setResult] = useState<{
+    query: DrillThroughQuery;
+    records: DrillThroughRecord[];
+    reconciledSum: number;
+    error: string | null;
+  } | null>(null);
 
   useEffect(() => {
     if (!query) return;
     let cancelled = false;
-    setLoading(true);
-    setError(null);
 
-    const supabase = createClient();
-    runDrillThroughQuery(supabase, query)
-      .then((result) => {
+    fetch("/api/drill-through", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(query),
+    })
+      .then(async (res) => {
+        const body = await res.json();
+        if (!res.ok) throw new Error(body?.error ?? "Failed to load records");
+        return body as { records: DrillThroughRecord[]; reconciledSum: number };
+      })
+      .then((r) => {
         if (cancelled) return;
-        setRecords(result.records);
-        setReconciledSum(result.reconciledSum);
+        setResult({ query, records: r.records, reconciledSum: r.reconciledSum, error: null });
       })
       .catch((err) => {
         if (cancelled) return;
-        setError(err instanceof Error ? err.message : "Failed to load records");
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
+        setResult({
+          query,
+          records: [],
+          reconciledSum: 0,
+          error: err instanceof Error ? err.message : "Failed to load records",
+        });
       });
 
     return () => {
       cancelled = true;
     };
   }, [query]);
+
+  // Only trust the settled result if it belongs to the query being shown --
+  // otherwise this query is still in flight.
+  const settled = result && result.query === query ? result : null;
+  const loading = query !== null && settled === null;
+  const error = settled?.error ?? null;
+  const records = settled && !settled.error ? settled.records : [];
+  const reconciledSum = settled?.reconciledSum ?? 0;
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {

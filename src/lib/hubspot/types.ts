@@ -1,8 +1,7 @@
 /**
  * HubSpot API response shapes actually consumed by the sync engine.
- * Field names match DESIGN_02_HubSpot_Field_Mapping.md exactly -- keep in sync
- * with that doc, and verify against a live sandbox portal once available
- * (see Design Doc 02 section 10 for the open verification items).
+ * Verify these against a live sandbox portal once one is available -- they
+ * were authored from HubSpot's public API docs, not confirmed live.
  */
 
 export interface HubspotDeal {

@@ -1,40 +1,19 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { decodeSession, SESSION_COOKIE } from "@/lib/auth/mock-session";
 
-const PUBLIC_PATHS = ["/login", "/signup"];
+const PUBLIC_PATHS = ["/login"];
 
-export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({ request });
+export function middleware(request: NextRequest) {
+  // API routes handle their own auth (see src/app/api/**) -- the page-level
+  // login/logout redirect dance below doesn't apply to them, and gating
+  // /api/auth/login here would make it unreachable while logged out.
+  if (request.nextUrl.pathname.startsWith("/api/")) {
+    return NextResponse.next();
+  }
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          response = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
-          );
-        },
-      },
-    },
-  );
-
-  // getClaims() verifies the session JWT locally against a cached JWKS instead
-  // of calling out to the Auth server on every request (as getUser() does) --
-  // routing guards run on every navigation, so this avoids a network round
-  // trip per click. Session validity is still enforced by signature + expiry.
-  const {
-    data,
-  } = await supabase.auth.getClaims();
-
+  const session = decodeSession(request.cookies.get(SESSION_COOKIE)?.value);
   const isPublicPath = PUBLIC_PATHS.some((path) => request.nextUrl.pathname.startsWith(path));
-  const isAuthenticated = Boolean(data?.claims);
+  const isAuthenticated = session !== null;
 
   if (!isAuthenticated && !isPublicPath) {
     const redirectUrl = new URL("/login", request.url);
@@ -46,7 +25,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {

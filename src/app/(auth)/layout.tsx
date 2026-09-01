@@ -13,11 +13,6 @@ const PANEL_CONTENT: Record<string, { src: string; heading: string; body: string
     heading: "See your operation clearly.",
     body: "Pipeline, service, and productivity — one workspace, scoped to what each role should see.",
   },
-  "/signup": {
-    src: "/illustrations/signup-illustration.svg",
-    heading: "Bring your team on board.",
-    body: "Set up your workspace in minutes and start turning raw activity into decisions.",
-  },
 };
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {

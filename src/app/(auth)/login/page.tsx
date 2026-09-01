@@ -2,11 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -32,12 +30,16 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
 
     setLoading(false);
-    if (error) {
-      setError(error.message);
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      setError(body?.error ?? "Unable to sign in.");
       return;
     }
     router.push("/");
@@ -126,13 +128,6 @@ export default function LoginPage() {
           <ArrowRight className="h-4 w-4" />
         </Button>
       </form>
-
-      <p className="mt-6 text-center text-sm text-text-muted">
-        Don&apos;t have an account?{" "}
-        <Link href="/signup" className="font-medium text-accent hover:text-accent-strong">
-          Create one
-        </Link>
-      </p>
     </motion.div>
   );
 }

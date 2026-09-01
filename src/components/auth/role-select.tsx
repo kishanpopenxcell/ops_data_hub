@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ShieldCheck, Users, UserCircle, Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DEMO_USERS } from "@/lib/auth/mock-session";
 
 export interface DemoRole {
   key: string;
@@ -14,32 +15,20 @@ export interface DemoRole {
   icon: typeof ShieldCheck;
 }
 
-export const DEMO_ROLES: DemoRole[] = [
-  {
-    key: "admin",
-    label: "Admin",
-    description: "Full tenant visibility across every team",
-    email: "admin@metrichub.com",
-    password: "MetricHub2026!",
-    icon: ShieldCheck,
-  },
-  {
-    key: "manager",
-    label: "Manager",
-    description: "Scoped to one team's pipeline and reps",
-    email: "manager@metrichub.com",
-    password: "MetricHub2026!",
-    icon: Users,
-  },
-  {
-    key: "rep",
-    label: "Rep",
-    description: "Scoped to their own deals and tickets",
-    email: "rep@metrichub.com",
-    password: "MetricHub2026!",
-    icon: UserCircle,
-  },
-];
+const ROLE_META: Record<string, { description: string; icon: typeof ShieldCheck }> = {
+  admin: { description: "Full tenant visibility across every team", icon: ShieldCheck },
+  manager: { description: "Scoped to one team's pipeline and reps", icon: Users },
+  rep: { description: "Scoped to their own deals and tickets", icon: UserCircle },
+};
+
+export const DEMO_ROLES: DemoRole[] = DEMO_USERS.map((user) => ({
+  key: user.role,
+  label: user.label,
+  description: ROLE_META[user.role].description,
+  email: user.email,
+  password: user.password,
+  icon: ROLE_META[user.role].icon,
+}));
 
 export function RoleSelect({
   value,
